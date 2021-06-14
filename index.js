@@ -55,6 +55,29 @@ app.get("/movies/read", function (req, res) {
   res.send({ status: 200, message: movies });
 });
 
+app.get("/movies/read/by-date", function (req, res) {
+  movies.sort(function (a, b) {
+    return a.year - b.year;
+  });
+  res.send({ status: 200, message: movies });
+});
+
+app.get("/movies/read/by-rating", function (req, res) {
+  movies.sort(function (a, b) {
+    return b.rating - a.rating;
+  });
+  res.send({ status: 200, message: movies });
+});
+
+app.get("/movies/read/by-title", function (req, res) {
+  movies.sort(function (a, b) {
+    if (a.title < b.title) return -1;
+    if (a.title > b.title) return 1;
+    return 0;
+  });
+  res.send({ status: 200, message: movies });
+});
+
 app.get("/movies/update", function (req, res) {});
 
 app.get("/movies/delete", function (req, res) {});
