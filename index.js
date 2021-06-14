@@ -29,7 +29,6 @@ app.get("/hello/:id", function (req, res) {
 });
 
 app.get("/hello/", function (req, res) {
-  const { id } = req.params;
   res.send({ status: 200, message: "Hello, unknown" });
 });
 
@@ -81,3 +80,14 @@ app.get("/movies/read/by-title", function (req, res) {
 app.get("/movies/update", function (req, res) {});
 
 app.get("/movies/delete", function (req, res) {});
+
+app.get("/movies/read/id/:id", function (req, res) {
+  const { id } = req.params;
+  for (let i = 0; i < movies.length; i++) {
+    if (id == i + 1) {
+      res.send({ status: 200, data: movies[i] });
+      break;
+    }
+    else res.status(404).send({status:404, error:true, message:'the movie id does not exist'});
+  }
+});
