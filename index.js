@@ -83,11 +83,16 @@ app.get("/movies/delete", function (req, res) {});
 
 app.get("/movies/read/id/:id", function (req, res) {
   const { id } = req.params;
-  for (let i = 0; i < movies.length; i++) {
+  for (var i = 0; i < movies.length; i++) {
     if (id == i + 1) {
       res.send({ status: 200, data: movies[i] });
       break;
     }
-    else res.status(404).send({status:404, error:true, message:'the movie id does not exist'});
   }
+  if (id <= 0 || id > movies.length)
+    res.status(404).send({
+      status: 404,
+      error: true,
+      message: "the movie id does not exist",
+    });
 });
