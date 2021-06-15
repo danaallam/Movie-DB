@@ -100,7 +100,42 @@ app.get("/movies/read/by-title", function (req, res) {
   res.send({ status: 200, message: movies });
 });
 
-app.get("/movies/update", function (req, res) {});
+app.get("/movies/update/:id", function (req, res) {
+  const { id } = req.params;
+  const title = req.query.title;
+  const year = req.query.year;
+  const rating = req.query.rating;
+  let isnum = /^\d+$/.test(year);
+  if (1 <= id && id <= movies.length) {
+    // console.log("A");
+    if (!title) {
+      if (!year && !isNaN(rating)) {
+        movies[id - 1].rating = parseFloat(rating);
+      } else if (!rating && isnum && year.length == 4) {
+        movies[id - 1].year = parseInt(year);
+      } else if (isnum && year.length == 4 && !isNaN(rating)) {
+        // console.log("B");
+        movies[id - 1].year = parseInt(year);
+        movies[id - 1].rating = parseFloat(rating);
+      }
+    } else if (!year) {
+      if (!isNaN(rating)) {
+        movies[id - 1].title = title;
+        movies[id - 1].rating = parseFloat(rating);
+      } else if (!rating) {
+        movies[id - 1].title = title;
+      }
+    } else if (!rating) {
+      movies[id - 1].year = parseInt(year);
+      movies[id - 1].title = title;
+    } else {
+      movies[id - 1].title = title;
+      movies[id - 1].year = parseInt(year);
+      movies[id - 1].rating = parseFloat(rating);
+    }
+    res.send({ status: 200, message: movies });
+  } else res.status(404).send({ status: 404, message: "the movie id does not exist" });
+});
 
 app.get("/movies/delete/:id", function (req, res) {
   const { id } = req.params;
@@ -112,13 +147,11 @@ app.get("/movies/delete/:id", function (req, res) {
     movies.pop();
     res.send({ status: 200, message: movies });
   } else
-    res
-      .status(404)
-      .send({
-        status: 404,
-        error: true,
-        message: "the movie id does not exist",
-      });
+    res.status(404).send({
+      status: 404,
+      error: true,
+      message: "the movie id does not exist",
+    });
 });
 
 app.get("/movies/read/id/:id", function (req, res) {
