@@ -48,7 +48,30 @@ app.get("/search", function (req, res) {
     });
 });
 
-app.get("/movies/create", function (req, res) {});
+app.get("/movies/create", function (req, res) {
+  const title = req.query.title;
+  const year = req.query.year;
+  const rating = req.query.rating;
+  let isnum = /^\d+$/.test(year);
+  if (!title || !year || !isnum || year.length < 4 || year.length > 4) {
+    res.status(403).send({
+      status: 403,
+      error: true,
+      message: "you cannot create a movie without providing a title and a year",
+    });
+  } else {
+    if (!parseFloat(rating))
+      movie = { title: title, year: parseInt(year), rating: 4 };
+    else
+      movie = {
+        title: title,
+        year: parseInt(year),
+        rating: parseFloat(rating),
+      };
+    movies.push(movie);
+    res.send({ status: 200, message: movies });
+  }
+});
 
 app.get("/movies/read", function (req, res) {
   res.send({ status: 200, message: movies });
