@@ -102,7 +102,24 @@ app.get("/movies/read/by-title", function (req, res) {
 
 app.get("/movies/update", function (req, res) {});
 
-app.get("/movies/delete", function (req, res) {});
+app.get("/movies/delete/:id", function (req, res) {
+  const { id } = req.params;
+  let i = parseInt(id);
+  if (0 < i && i < movies.length) {
+    movies.splice(i - 1, 1);
+    res.send({ status: 200, message: movies });
+  } else if (i == movies.length) {
+    movies.pop();
+    res.send({ status: 200, message: movies });
+  } else
+    res
+      .status(404)
+      .send({
+        status: 404,
+        error: true,
+        message: "the movie id does not exist",
+      });
+});
 
 app.get("/movies/read/id/:id", function (req, res) {
   const { id } = req.params;
