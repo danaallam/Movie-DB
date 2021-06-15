@@ -106,13 +106,10 @@ app.get("/movies/delete", function (req, res) {});
 
 app.get("/movies/read/id/:id", function (req, res) {
   const { id } = req.params;
-  for (var i = 0; i < movies.length; i++) {
-    if (id == i + 1) {
-      res.send({ status: 200, data: movies[i] });
-      break;
-    }
-  }
-  if (id <= 0 || id > movies.length)
+  if (0 < id && id <= movies.length) {
+    let i = parseInt(id);
+    res.send({ status: 200, data: movies[i - 1] });
+  } else
     res.status(404).send({
       status: 404,
       error: true,
