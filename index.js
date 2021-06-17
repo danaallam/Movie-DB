@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
-const today = new Date();
-const time = today.getHours() + ":" + today.getMinutes();
+const con = require('./database');
+// const movies = require('./movies');
+
+con();
+
 const movies = [
   { title: "Jaws", year: 1975, rating: 8 },
   { title: "Avatar", year: 2009, rating: 7.8 },
@@ -21,6 +24,8 @@ app.get("/test", function (req, res) {
 });
 
 app.get("/time", function (req, res) {
+  const today = new Date();
+  const time = today.getHours() + ":" + today.getMinutes();
   res.send({ status: 200, message: time });
 });
 
@@ -47,37 +52,6 @@ app.get("/search", function (req, res) {
       error: true,
       message: "you have to provide a search",
     });
-});
-
-app.post("/movies/create", function (req, res) {
-  const title = req.body.title;
-  const year = req.body.year;
-  const rating = req.body.rating;
-  let isnum = /^\d+$/.test(year);
-  if (!title || !year || !isnum || year.toString().length < 4 || year.toString().length > 4) {
-    res.status(403).send({
-      status: 403,
-      error: true,
-      message: "you cannot create a movie without providing a title and a year",
-    });
-  } else {
-    if (!rating) 
-      movie = { title: title, year: parseInt(year), rating: 4 };
-    else if(isNaN(rating) || rating<0 || rating>10)
-    res.status(403).send({
-      status: 403,
-      error: true,
-      message: "Enter a valid rating please"
-    });
-    else
-      movie = {
-        title: title,
-        year: parseInt(year),
-        rating: parseFloat(rating),
-      };
-    movies.push(movie);
-    res.send({ status: 200, message: movies });
-  }
 });
 
 app.get("/movies/read", function (req, res) {
@@ -109,6 +83,55 @@ app.get("/movies/read/by-title", function (req, res) {
   res.send({ status: 200, message: movies });
 });
 
+app.get("/movies/read/id/:id", function (req, res) {
+  const { id } = req.params;
+  if (0 < id && id <= movies.length) {
+    let i = parseInt(id);
+    res.send({ status: 200, data: movies[i - 1] });
+  } else
+    res.status(404).send({
+      status: 404,
+      error: true,
+      message: "the movie id does not exist",
+    });
+});
+
+app.get("/movies/read/id/", function (req, res) {
+  res.send({ status: 200, message: "Please enter an id" });
+});
+
+app.post("/movies/create", function (req, res) {
+  const title = req.body.title;
+  const year = req.body.year;
+  const rating = req.body.rating;
+  let movie;
+  let isnum = /^\d+$/.test(year);
+  if (!title || !year || !isnum || year.toString().length < 4 || year.toString().length > 4) {
+    res.status(403).send({
+      status: 403,
+      error: true,
+      message: "you cannot create a movie without providing a title and a year",
+    });
+  } else {
+    if (!rating) 
+      movie = { title: title, year: parseInt(year), rating: 4 };
+    else if(isNaN(rating) || rating<0 || rating>10)
+    res.status(403).send({
+      status: 403,
+      error: true,
+      message: "Enter a valid rating please"
+    });
+    else
+      movie = {
+        title: title,
+        year: parseInt(year),
+        rating: parseFloat(rating),
+      };
+    movies.push(movie);
+    res.send({ status: 200, message: movies });
+  }
+});
+
 app.put("/movies/update/:id", function (req, res) {
   const { id } = req.params;
   const title = req.body.title;
@@ -117,7 +140,7 @@ app.put("/movies/update/:id", function (req, res) {
   let isnum = /^\d+$/.test(year);
   if (1 <= id && id <= movies.length) {
     if ((year && (!isnum || year.toString().length < 4 || year.toString().length > 4)) || (rating && (isNaN(rating) || rating<0 || rating>10))) {
-      return res.send({ status: 200, message: "ERROR" });
+      return res.send({ status: 200, message: "Please enter a valid year or rating" });
     }
     if (title) {
       movies[id - 1].title = title;
@@ -163,22 +186,5 @@ app.delete("/movies/delete/:id", function (req, res) {
 });
 
 app.delete("/movies/delete/", function (req, res) {
-  res.send({ status: 200, message: "Please enter an id" });
-});
-
-app.get("/movies/read/id/:id", function (req, res) {
-  const { id } = req.params;
-  if (0 < id && id <= movies.length) {
-    let i = parseInt(id);
-    res.send({ status: 200, data: movies[i - 1] });
-  } else
-    res.status(404).send({
-      status: 404,
-      error: true,
-      message: "the movie id does not exist",
-    });
-});
-
-app.get("/movies/read/id/", function (req, res) {
   res.send({ status: 200, message: "Please enter an id" });
 });
